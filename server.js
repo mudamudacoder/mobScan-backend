@@ -82,5 +82,6 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
+app.listen(5000, () => console.log("Server ready on port 5000"));
 // Start the server and listen on a port
 module.exports = app;
