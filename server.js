@@ -3,6 +3,7 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const dotenv = require('dotenv');
+const path = require('path');
 
 // Initialize environment variables
 dotenv.config();
