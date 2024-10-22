@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "npx prisma generate client && npm run build"
+    "finbuild": "npx prisma generate client && npm run build"
   },
   "dependencies": {
     "@prisma/client": "^5.21.1",
