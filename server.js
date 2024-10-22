@@ -7,11 +7,7 @@ const dotenv = require('dotenv');
 // Initialize environment variables
 dotenv.config();
 
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html')); // Serve index.html
-  });
 
 // Initialize Prisma Client
 const prisma = new PrismaClient();
@@ -21,6 +17,12 @@ const app = express();
 
 // Middleware to parse incoming JSON requests
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html')); // Serve index.html
+  });
 
 // API Route to get all products
 app.get('/api/products', async (req, res) => {
