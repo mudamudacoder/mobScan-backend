@@ -1,7 +1,8 @@
 {
   "scripts": {
     "finbuild": "npx prisma generate && npm run build",
-    "build": "node server.js"
+    "build": "node server.js",
+    "postinstall": "npx prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.21.1",
