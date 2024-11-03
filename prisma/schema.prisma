@@ -13,9 +13,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model product {
-  productCode String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  barCode String @unique
-  description String
+// model product {
+//   productCode String @id @default(auto()) @map("_id") @db.ObjectId
+//   name String
+//   barCode String @unique
+//   description String
+// }
+model orderHeader {
+  orderHash String @id @default(auto()) @map("_id") @db.ObjectId
+  plantDate DateTime
+  orderNr Int 
+}
+model orderRows {
+  orderRowsHash String @id @default(auto()) @map("_id") @db.ObjectId
+  orderNr Int
+  itemNumber String
+  quantity Int
+}
+model itemAll {
+  itemHash String @id @default(auto()) @map("_id") @db.ObjectId
+  itemNumber String
+  itemDescription String
+  pickAreaNr String
+  uom String
+  smallText String? @default("No Small Text")
+}
+model pickAreas {
+  pickAreaHash String @id @default(auto()) @map("_id") @db.ObjectId
+  pickAreaNr String
+  pickAreaName String
 }
