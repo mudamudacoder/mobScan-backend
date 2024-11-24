@@ -5,6 +5,7 @@ const { PrismaClient } = require('@prisma/client');
 const dotenv = require('dotenv');
 const path = require('path');
 const cors = require('cors');
+const { error } = require('console');
 dotenv.config();
 
 // Initialize Prisma Client
@@ -18,6 +19,62 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+app.get('/api/order/:orderNum', async (req, res) => {
+  const { orderNum } = req.params;
+
+  try {
+    // Fetch order details
+    const orderDetails = await prisma.orderHeader.findFirst({
+      where: { orderNr: parseInt(orderNum, 10) },
+    });
+
+    if (!orderDetails) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    // Fetch items in the order
+    const orderItems = await prisma.orderRows.findMany({
+      where: { orderNr: parseInt(orderNum, 10) },
+    });
+
+    if (!orderItems || orderItems.length === 0) {
+      return res.status(404).json({ error: 'No items found in this order' });
+    }
+
+    // Fetch item descriptions and build response array
+    const itemDetailsPromises = orderItems.map(async (item) => {
+      const itemDetails = await prisma.itemAll.findFirst({
+        where: { itemNumber: item.itemNumber },
+      });
+
+      const pickAreaInfo = itemDetails ? await prisma.pickAreas.findFirst({
+        where: {pickAreaNr: itemDetails.pickAreaNr},
+      }) : null;
+
+      return {
+        itemNumber: item.itemNumber,
+        quantity: item.quantity,
+        itemDescription: itemDetails?.itemDescription || 'Description not available',
+        smallText: itemDetails?.smallText || '',
+        pickAreaName: pickAreaInfo?.pickAreaName || 'Unknown',
+      };
+    });
+
+    const itemsWithDetails = await Promise.all(itemDetailsPromises);
+
+    // Combine order and item details for response
+    const response = {
+      orderNr: orderDetails.orderNr,
+      plantDate: orderDetails.plantDate,
+      items: itemsWithDetails,
+    };
+
+    res.json(response);
+  } catch (error) {
+    console.error('Error fetching order details:', error);
+    res.status(500).json({ error: 'An error occurred while processing your request.' });
+  }
 });
 
 // Route to get order and item details by combined orderNr|itemNumber
